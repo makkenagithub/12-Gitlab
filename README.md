@@ -21,6 +21,10 @@ git add .; git commint -m "message"; git push -u origin
 2. We can add files to gitlap repository using web IDE. Open gitlab project / repos -> Edit -> Web IDE -> (its like VS code) -> add file -> click on source control button and commit.
 3. We can add directly from gitlab console. Goto project -> + button -> add file or dorectory -> commit
 
+GitLab Pipeline:
+
+It consists of stages(eg: build, test, deploy) and jobs (compiling code, running tests). Pipeline can be triggered by code pushes, merge requests or scheduled runs.
+
 Pipeline filename syntax:
 ```
 .gitlab-ci.yml
@@ -75,10 +79,6 @@ deploy_b:
 
 
 
-
-GitLab Pipeline:
-
-It consists of stages(eg: build, test, deploy) and jobs (compiling code, running tests). Pipeline can be triggered by code pushes, merge requests or scheduled runs.
 
 
 
