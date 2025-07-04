@@ -23,6 +23,8 @@ git add .; git commint -m "message"; git push -u origin
 
 GitLab Pipeline:
 
+https://docs.gitlab.com/ci/pipelines/pipeline_architectures/
+
 It consists of stages(eg: build, test, deploy) and jobs (compiling code, running tests). Pipeline can be triggered by code pushes, merge requests or scheduled runs.
 
 Pipeline filename syntax:
@@ -75,6 +77,15 @@ deploy_b:
     - echo "test stage complete. It will start at about the same time as deploy_a."
   environment: production
 ```
+
+##### Pipeline editor in GitLab:
+We have pipeline editor in gitlab, it gives suggestions, syntax suggestions related info etc. 
+<img width="539" alt="image" src="https://github.com/user-attachments/assets/bf696bd8-fd32-4b62-a476-5038c310a5dc" />
+
+<img width="530" alt="image" src="https://github.com/user-attachments/assets/9534359d-5d04-4f17-a465-e8325fd89b0d" />
+
+We have visualisation and validate options also. We can edit the pipe line from pipeline editor and commit it to gilab repos.
+
 
 
 
