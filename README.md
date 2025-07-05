@@ -87,6 +87,128 @@ We have pipeline editor in gitlab, it gives suggestions, syntax suggestions rela
 We have visualisation and validate options also. We can edit the pipe line from pipeline editor and commit it to gilab repos.
 
 
+Timeout:
+```
+job1:
+  timeout: 10 minutes  # 3 hours 30 minutes or 3h 30m
+  script:
+    - echo "Hi, this is timeout job example"
+```
+
+###### Stages:
+<img width="497" alt="image" src="https://github.com/user-attachments/assets/aea0fd02-9af1-4897-a3ab-bbf9e77411fd" />
+
+Multiple stages can be placed in the pipeline. Each stage can have multiple jobs. Stages run sequentially. And jobs in each stage run parallely. 
+If a stage fails, then pipeline will be aborted.
+
+```
+stages:
+  - first
+  - second
+  - third
+job1:
+  stage: first
+  script:
+    - echo "its first stage job"
+job2:
+  stage: second
+  script:
+    - echo "its second stahe job"
+job3:
+  stage: third
+  script:
+    - echo: "its third stage job"
+```
+
+##### Needs:
+<img width="527" alt="image" src="https://github.com/user-attachments/assets/06525b34-2e9e-4923-840a-86da2ce90269" />
+
+An array of jobs (maximum of 50 jobs).
+
+An empty array ([]), to set the job to start as soon as the pipeline is created.
+```
+job1:
+  script:
+    - echo "hello world"
+job2:
+  needs:
+    - job1
+  script:
+    - echo "hi- its second job"
+  
+```
+Job2 is dependent on job1 here. If job1 fails then job2 wont run.
+
+Visualisation as below:
+<img width="170" alt="image" src="https://github.com/user-attachments/assets/3ab30a1e-f8a5-475a-8e7e-d2d5929cc685" />
+
+##### before_script , after_script:
+before_script , after_script are keywords in the job. 
+
+<img width="491" alt="image" src="https://github.com/user-attachments/assets/9241ce62-c749-4656-b1a3-722221f57d51" />
+
+<img width="475" alt="image" src="https://github.com/user-attachments/assets/6ef5eaca-e268-4dc5-b1f4-2272594e19f5" />
+
+```
+job1:
+  before_script:
+    - echo "hi, its before script"
+  script:
+    - echo "hi, its script"
+  after_script:
+    - echo "hi its after script"
+```
+##### linux commands in job
+```
+job1:
+  script:
+    - ls -lrt
+    - pwd
+    - mkdir suresh
+```
+##### shell script execution:
+```
+job1:
+  script:
+    - chmod +x test.sh
+    - ./test.sh
+```
+##### multiple line linux commands:
+We can do by using pipe symbol '|' as below or write multiple lines as below
+```
+job1:
+  script:
+    - |
+        echo "hi"
+        ls -lrt
+        pwd
+        echo "multi line commands using | symbol"
+
+job2:
+  script:
+    - echo "hi"
+    - ls -lrt
+    - pwd
+    - echo "multi line commands using general way"
+```
+##### commenting in gitlab pipeline
+'#' sybol is used comment single line. In fact multi line comments are not possible in gitlab. But we can comment a job by using '.' dot symbol infront of job , as shown in job2
+
+```
+job1:
+  script:
+    - echo "hi"
+    # - ls -lrt
+    # - pwd
+
+.job2:
+  script:
+    - echo "hi"
+    - ls -lrt
+
+```
+
+
 
 
 
