@@ -274,6 +274,41 @@ job1:
 ```
 <img width="272" alt="image" src="https://github.com/user-attachments/assets/eeadf0be-3bd1-4e70-89e0-5330222a6957" />
 
+##### built-in / pre-defined variables:
+https://docs.gitlab.com/ci/variables/predefined_variables/
 
+```
+job1:
+  script:
+    - echo "project is $CI_PIPELINE_ID"
+    - echo "password is $CI_JOB_ID" 
+```
+
+TO see all the built-in or pre defined variable values for a job , we can use 'export' command as below
+```
+job1:
+  script:
+    - echo "project is $CI_PIPELINE_ID"
+    - echo "password is $CI_JOB_ID"
+    - export
+```
+export shows the all the predefined variables and its values.
+
+##### file variable:
+Generally when we are using keys (public key, private key etc) for working configuration, we can use these file variables. Also we can store a bigger values in a file and use it.
+
+settings -> variables -> add variable -> choose file type - here give key (its the file variable name) and value.
+
+<img width="529" alt="image" src="https://github.com/user-attachments/assets/bee21235-bb3c-4eaf-b160-6f6d39fd6101" />
+
+```
+job1:
+  script:
+    - echo "file value is $file_var"  # it shows the path of file variable
+    - cat $file_var    # it shows the file data
+```
+<img width="271" alt="image" src="https://github.com/user-attachments/assets/3dbc17d1-14e6-4dfc-a197-6f709a013cca" />
+
+Generally we use, file variable for configuration files, private keys etc
 
 
