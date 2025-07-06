@@ -1,5 +1,7 @@
 # 12-Gitlab
 
+https://docs.gitlab.com/ci/yaml/
+
 GitLab is a web based devops life cycle tool that provides a Git repository manager with features like CI/CD, issue tracking, and project management.
 
 Key Features:
@@ -12,6 +14,7 @@ Key Features:
 
 . Collaboration: Code reviews, merge requests, and wikis to enhance team collaboration.
 
+https://docs.gitlab.com/ci/yaml/
 
 Adding files to Gitlab repository:
 1. we can add files from an ec2 instance by cloning gitlap repos. Then
@@ -208,9 +211,68 @@ job1:
 
 ```
 
+##### Artifacts:
+
+<img width="480" alt="image" src="https://github.com/user-attachments/assets/66bfd7d3-28fa-43ac-8781-907e846c9e60" />
+
+<img width="457" alt="image" src="https://github.com/user-attachments/assets/6a89f22f-5a7b-4eba-a0f6-01088be6e88a" />
+
+Gitlab is complete CI/CD tool. It has package repository to store the packages generated during job like jar files, war files, log files, test results etc. All these artifacts can be stored in pakcage manager in gitlab.
+
+And gitlab has container reposiry to store docker images.
+
+And open sources also available, we have Jfrog, Nexus also to store the artifcats.
+
+```
+job1:
+  - echo "hello world" > hello.txt
+  artifacts:
+    name: test-file
+    paths:
+      - ./hello.txt
+      - /bin/
+    when: on_success
+    access: all
+    expires_in: 30 days
+
+```
+Artifact (in zip format) is generaed with the name of artifact , here its test-file.zip
 
 
+##### Variables:
+We have use variables key word to use. In below session we see global variables and job based variables
 
+```
+# pipeline based variables i.e global variable
+variables:  
+  name: "suresh"
+  company: "ibm"
+job1:
+  # job based variables, accessable within the job
+  variables:  
+    location: "chennai"
+  script:
+    - echo "name and comany are: $name and $company"
+    - echo "location is $location "
+```
+
+Custom / Project based variables:
+
+Login to git lab -> settings -> CI/CD -> Variables -> Add variable
+
+<img width="533" alt="image" src="https://github.com/user-attachments/assets/c5bb95a1-4204-4f74-acbb-09f9502e98b4" />
+
+<img width="193" alt="image" src="https://github.com/user-attachments/assets/a1f4963c-1b25-49e3-8f73-5c5de8aeb796" />
+
+We can use masked variable to store passwords. Masked/protected variables are not seen in job logs. Its shows as [MASKED]
+
+```
+job1:
+  script:
+    - echo "project is $project"
+    - echo "password is $password" 
+```
+<img width="272" alt="image" src="https://github.com/user-attachments/assets/eeadf0be-3bd1-4e70-89e0-5330222a6957" />
 
 
 
