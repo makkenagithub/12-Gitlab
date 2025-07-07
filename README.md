@@ -311,4 +311,48 @@ job1:
 
 Generally we use, file variable for configuration files, private keys etc
 
+##### dynamic variables / parametaring the variables
+<img width="548" alt="image" src="https://github.com/user-attachments/assets/715f49bc-2ff8-4180-ae1d-3cf30d15041e" />
+
+Here the age is 2 printed when we run below pipeline. To pass the value dynamically, click on run pipeline and specify the values above
+```
+variables:
+  age: 2
+job1:
+  script:
+    - echo "age is $age"
+```
+##### skipping pipe line:
+When we commit a pipeline in gitlab it runs automatically. To disable this automatic running of pipeline after commiting, we have to mention commit messages as below
+
+[skip ci]
+
+or
+
+[ci skip]
+
+<img width="170" alt="image" src="https://github.com/user-attachments/assets/91602f6c-10f5-4694-832a-2194838ad2d1" />
+
+
+<img width="542" alt="image" src="https://github.com/user-attachments/assets/924dbbc7-38da-42e8-b0c3-da5163250ddf" />
+
+##### manual triggering of pipeline
+
+https://docs.gitlab.com/ci/yaml/#when
+
+when keyword can be used to skip the job run after committing the pipeline and we can run the pipeline/job manually
+
+```
+job1:
+  when: manual
+  script:
+    - echo "run the job manually"
+```
+
+#### rules and only:
+
+rules is newly added and only will be depricated in upcoming gitlab versions.
+
+<img width="397" alt="image" src="https://github.com/user-attachments/assets/ae741810-f0eb-4205-8aad-ce3599baa433" />
+
 
