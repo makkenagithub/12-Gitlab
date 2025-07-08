@@ -509,4 +509,23 @@ deploy-prod:    # this job runs on node
     - echo "deploy to prod env"
 ```
 
+##### installing / downloading packages:
+This example is for installing git in ubuntu image and displaying its version
+```
+image: ubuntu:latest
+job1:
+  before_script:
+    - apt-get update
+    - apt-get install git -y    # this installs the git
+  script:
+    - git version
+
+```
+<img width="277" alt="image" src="https://github.com/user-attachments/assets/ee4c2b2a-e9fa-4161-94d5-03c02ebd118d" />
+
+##### loops / matrix:
+
+
+
+
 
