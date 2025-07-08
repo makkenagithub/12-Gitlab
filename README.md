@@ -225,7 +225,8 @@ And open sources also available, we have Jfrog, Nexus also to store the artifcat
 
 ```
 job1:
-  - echo "hello world" > hello.txt
+  script:
+    - echo "hello world" > hello.txt
   artifacts:
     name: test-file
     paths:
