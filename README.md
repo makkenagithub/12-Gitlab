@@ -482,6 +482,31 @@ Creating merge request in gitlab:
 
 <img width="542" alt="image" src="https://github.com/user-attachments/assets/90b35d93-a4a8-4e86-9d0e-86128097bf25" />
 
+##### images on shared runner:
+When we run pipeline in gitlab , pipeline is running on ruby image. We can change it.
 
+```
+image: debian:latest    # Global image. all the jobs run on debian, if any job has specified with image, then that job runs on the specified image 
+workflow:
+  name: test-workflow
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_PIPELINE_SOURCE == "merge_request_event"     # this pipeline runs when the commit is for main branch or merge request is created
+      when: always
+    - when: never    
+init-job:      # this job runs on debian
+  script:
+    - echo "its init stage"
+build-job:     # this job runs on ubuntu
+  image: ubuntu:latest
+  script:
+    - echo "its build job"
+deploy-job:    # this job runs on debian
+  script:
+    - echo "its deployment job to test"
+deploy-prod:    # this job runs on node
+  image: node:latest
+  script:
+    - echo "deploy to prod env"
+```
 
 
