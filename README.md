@@ -349,10 +349,138 @@ job1:
     - echo "run the job manually"
 ```
 
-#### rules and only:
+#### rules and only/except:
 
-rules is newly added and only will be depricated in upcoming gitlab versions.
+rules is newly added and only/except will be depricated in upcoming gitlab versions.
 
 <img width="397" alt="image" src="https://github.com/user-attachments/assets/ae741810-f0eb-4205-8aad-ce3599baa433" />
+
+In industry, rules are used when working on feature branch i.e. for testing or dev env, and not deploy to prod.
+
+We can create group project also in gitlab. Groups -> new group -> create group. Then we can create new sub groups or else create new project in the group.
+
+<img width="529" alt="image" src="https://github.com/user-attachments/assets/e41be598-f70d-4480-acf9-42ed385cbdac" />
+
+```
+init-job:
+  script:
+    - echo "its init stage"
+build-job:
+  script:
+    - echo "its build job"
+deploy-job:
+  script:
+    - echo "its deployment job to test"
+deploy-prod:
+  script:
+    - echo "deploy to prod env"
+```
+Now the above 4 jobs run parallely.
+
+Now create a new branch feature branch from main branch, as below
+
+<img width="566" alt="image" src="https://github.com/user-attachments/assets/47bd36bc-6cc3-4915-ab54-bc5d25c8483b" />
+
+When we create a feature branch, then pipeline running automatically
+
+<img width="555" alt="image" src="https://github.com/user-attachments/assets/487f94d2-b51f-4005-a135-5b22fa3b197c" />
+
+So our requirement is not deploy to prod when its feature branch.
+
+We can choose main / feature branch as below and use only keyword
+<img width="587" alt="image" src="https://github.com/user-attachments/assets/5e29bb27-2d23-4d41-abbe-54892b2f2e04" />
+
+```
+init-job:
+  script:
+    - echo "its init stage"
+build-job:
+  script:
+    - echo "its build job"
+deploy-job:
+  script:
+    - echo "its deployment job to test"
+deploy-prod:
+  only:
+    - main  # This job runs only when the code is from main branch. 
+  script:
+    - echo "deploy to prod env"
+```
+Usage of rules:
+```
+init-job:
+  script:
+    - echo "its init stage"
+build-job:
+  script:
+    - echo "its build job"
+deploy-job:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"      # if this condition is true then this job is deployed as we have when condition inside if block as always.
+      when: always
+    - when: never     # this when condition is like an else part of above if.  if the above condition is not true, then its never deployed.
+  script:
+    - echo "its deployment job to test"
+deploy-prod:
+  only:
+    - main  # This job runs only when the code is from main branch. 
+  script:
+    - echo "deploy to prod env"
+```
+##### workflow:
+until now we are placing rules at job level. We can use workflow to place the rules at pipeline level. So the entire pipeline can be controlled.
+So workflow is to set the rules at the centralised position.
+
+```
+workflow:
+  name: test-workflow
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"  # this pipeline runs when the commit is for main branch
+      when: always
+    - when: never    
+init-job:
+  script:
+    - echo "its init stage"
+build-job:
+  script:
+    - echo "its build job"
+deploy-job:
+  script:
+    - echo "its deployment job to test"
+deploy-prod:
+  script:
+    - echo "deploy to prod env"
+```
+
+##### understanding merge request
+<img width="506" alt="image" src="https://github.com/user-attachments/assets/4c40e1c1-3b4b-43c2-ad77-cc7050d3b12d" />
+
+<img width="460" alt="image" src="https://github.com/user-attachments/assets/bf850b51-a64e-427e-8115-c10380615c7d" />
+
+```
+workflow:
+  name: test-workflow
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_PIPELINE_SOURCE == "merge_request_event"     # this pipeline runs when the commit is for main branch or merge request is created
+      when: always
+    - when: never    
+init-job:
+  script:
+    - echo "its init stage"
+build-job:
+  script:
+    - echo "its build job"
+deploy-job:
+  script:
+    - echo "its deployment job to test"
+deploy-prod:
+  script:
+    - echo "deploy to prod env"
+```
+Creating merge request in gitlab:
+
+<img width="542" alt="image" src="https://github.com/user-attachments/assets/90b35d93-a4a8-4e86-9d0e-86128097bf25" />
+
+
 
 
