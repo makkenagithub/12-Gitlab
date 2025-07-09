@@ -570,6 +570,60 @@ job1:
 
 ##### handling job failure:
 
+When the job fails in a stage, then pipeline does not goto next stage. If we want the pipeline to execute next stage even if a job fails, then 
+we can add allo_failure: true in that job
 
+```
+stages:
+  - build
+  - test
+job1:
+  stage: build
+  script:
+    - echo "build job"
+job2:
+  stage: build
+  script:
+    - echooooo "this job fails"
+  allow_failure: true
+job3:
+  stage: test
+  script:
+    - echo "test job"
+```
+
+##### multi-project pipeline / downstream pipeline
+
+<img width="494" alt="image" src="https://github.com/user-attachments/assets/1f99739e-c48b-40ad-8714-f3fa086ff571" />
+
+Another pipeline can be triggered from a pipeline using keyword 'trigger'
+create 2 projects in gitlab and a pipeline in each project
+
+project1- pipeline
+```
+stages:
+  - stage1
+  - stage2
+project1-job1:
+  stage: stage1
+  script:
+    - echo "job1 in project 1"
+project1-job2:
+  stage: stage2
+  trigger:
+    project: group2/project2    # <group-name>/<project-name>
+    branch: main
+```
+
+project2- pipeline:
+```
+project2-job1:
+  script:
+    - echo "its project2 downstream job "
+```
+
+<img width="319" alt="image" src="https://github.com/user-attachments/assets/de21f88b-9613-4721-8d7b-4e8110d4cc79" />
+
+#### Runners:
 
 
