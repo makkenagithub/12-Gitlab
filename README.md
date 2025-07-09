@@ -525,7 +525,43 @@ job1:
 
 ##### loops / matrix:
 
+```
+job1:
+  script:
+    - echo "this is $environment"
+  parallel:
+    matrix:
+      - environment: [dev, test, prod]
 
+#this is dev
+#this is test
+#this is prod
+```
+The above one runs are 3 jobs as below
+
+<img width="242" alt="image" src="https://github.com/user-attachments/assets/c90ffbe5-e0a1-4e69-87f5-b97d46cef8a6" />
+
+multi loop / nested loop. Below job repeates 9 times
+```
+job1:
+  script:
+    - echo "this is $environment and version is $version"
+  parallel:
+    matrix:
+      - environment: [dev, test, prod]
+        version: [1, 2, 3]
+
+#this is dev and version is 1
+#this is dev and version is 2
+#this is dev and version is 3
+#this is test and version is 1
+#this is test and version is 2
+#this is test and version is 3
+#this is prod and version is 1
+#this is prod and version is 2
+#this is prod and version is 3
+```
+<img width="226" alt="image" src="https://github.com/user-attachments/assets/941d9a50-f2d4-41bf-892d-a9910652c33c" />
 
 
 
