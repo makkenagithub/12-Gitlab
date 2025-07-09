@@ -626,4 +626,21 @@ project2-job1:
 
 #### Runners:
 
+<img width="487" alt="image" src="https://github.com/user-attachments/assets/484c44e1-30b9-421a-9db1-a362eb44ab61" />
+
+we use self managed runnrs in realtime
+
+<img width="459" alt="image" src="https://github.com/user-attachments/assets/de151e3f-1ae1-4032-828b-4976596001ca" />
+
+#### Executors:
+
+<img width="498" alt="image" src="https://github.com/user-attachments/assets/88bec4cd-2b23-4076-a9d5-b385aeae6d68" />
+
+<img width="494" alt="image" src="https://github.com/user-attachments/assets/2cb241dd-0f36-4ab2-bf2a-ce7e7f88ddc7" />
+
+<img width="249" alt="image" src="https://github.com/user-attachments/assets/7ea81847-753d-4832-bebe-f0a9dfc35a34" />
+
+
+
+
 
