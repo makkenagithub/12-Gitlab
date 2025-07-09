@@ -563,5 +563,13 @@ job1:
 ```
 <img width="226" alt="image" src="https://github.com/user-attachments/assets/941d9a50-f2d4-41bf-892d-a9910652c33c" />
 
+##### Scheduling jobs:
+<img width="502" alt="image" src="https://github.com/user-attachments/assets/989198b7-2036-4cef-af9d-4d0e513f740d" />
+
+<img width="207" alt="image" src="https://github.com/user-attachments/assets/bcfa7f3a-d43e-47c6-a056-aa987e722681" />
+
+##### handling job failure:
+
+
 
 
