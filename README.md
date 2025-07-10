@@ -692,6 +692,21 @@ install git in ec2 'sudo dnf intsall git -y' and retry
 
 <img width="316" alt="image" src="https://github.com/user-attachments/assets/a09dc099-9c7c-4d80-b301-2278c792f7eb" />
 
+While creating runners, we have linux, macos, windows as runners platform. For windows, we need to use powershell to execute the commands provided by gitlab.
+
+While registering the runner, we can provide docker as executor and there, we ened to give docker image name. FOr eg: assume we have given ubuntu:latest as image. So ubuntu becomes default image. 
+
+We can change this image as below in the pipeline
+```
+job1:
+  image: alpine:latest
+  tags:
+    - ec2
+    - docker
+  script:
+    - echo "hello, its docker executor"
+```
+
 
 
 
