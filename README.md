@@ -640,6 +640,59 @@ we use self managed runnrs in realtime
 
 <img width="249" alt="image" src="https://github.com/user-attachments/assets/7ea81847-753d-4832-bebe-f0a9dfc35a34" />
 
+##### disabling shared runner:
+settings -> ci/cd -> runners -> disable the field 'instance runners for this project'
+
+#### self managed runner:
+
+Create an ec2 in aws using Amazon Linux.
+
+Now come to gitlab home project -> setting -> ci/cd -> runners -> New project runner
+
+<img width="426" alt="image" src="https://github.com/user-attachments/assets/9df1c97c-f562-4d89-8957-50de45ab07b6" />
+
+<img width="419" alt="image" src="https://github.com/user-attachments/assets/5ee0a5a1-5055-4c65-929e-9820145a336b" />
+
+As we did not install anything in EC2, we have install gitlab related things in ec2. Follow the steps shown in gitlab console while registering runner
+
+<img width="180" alt="image" src="https://github.com/user-attachments/assets/da65d0b6-d7eb-4077-a485-c651ea98b43a" />
+
+
+<img width="421" alt="image" src="https://github.com/user-attachments/assets/e8f81bfd-5502-4e29-98da-ef4a8c6164f8" />
+
+Gitlab version is 17
+
+We can see different executers
+
+<img width="530" alt="image" src="https://github.com/user-attachments/assets/486935c2-5544-4859-8619-e76a2d1c5d4b" />
+
+<img width="422" alt="image" src="https://github.com/user-attachments/assets/30001310-64a4-47b7-b285-27b73ab0eb11" />
+
+<img width="413" alt="image" src="https://github.com/user-attachments/assets/a201bc5b-1dff-4087-ba5e-0b9740d2bb0e" />
+
+We have to add tags in pipeline , so that pipeline chooses the runner with the tags matched
+
+```
+job1:
+  tags:
+    - ec2
+    - ohio
+    - shell
+  script:
+    - echo "hello its self manager runner"
+```
+
+After commiting the pipeline, its started running/executing in ec2 as below.
+
+Here job s failed because , git is not installed in ec2.
+
+<img width="309" alt="image" src="https://github.com/user-attachments/assets/93691fda-b459-4392-bca5-eb309e0ca461" />
+
+install git in ec2 'sudo dnf intsall git -y' and retry
+
+<img width="316" alt="image" src="https://github.com/user-attachments/assets/a09dc099-9c7c-4d80-b301-2278c792f7eb" />
+
+
 
 
 
