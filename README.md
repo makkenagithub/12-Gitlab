@@ -694,7 +694,7 @@ install git in ec2 'sudo dnf intsall git -y' and retry
 
 While creating runners, we have linux, macos, windows as runners platform. For windows, we need to use powershell to execute the commands provided by gitlab.
 
-While registering the runner, we can provide docker as executor and there, we ened to give docker image name. FOr eg: assume we have given ubuntu:latest as image. So ubuntu becomes default image. 
+While registering the runner, we can provide docker as executor and there, we need to give docker image name. FOr eg: assume we have given ubuntu:latest as image. So ubuntu becomes default image. 
 
 We can change this image as below in the pipeline
 ```
@@ -705,6 +705,52 @@ job1:
     - docker
   script:
     - echo "hello, its docker executor"
+```
+
+prerequites in ec2 to install docker
+```
+sudo yum install docker -y
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+sudo systemctl start docker.service
+docker ps
+sudo chmod 777 /var/run/docker.sock
+docker ps
+```
+#### multiple executors in a single self managed runner:
+Create an ec2 in aws.
+Now come to gitlab console and create runner (tags are ec2, shell) and follow the steps and run the gitlab-register command in ec2 and give shell as executer. So the runner is created with the self hosted ec2.
+
+Again goto gitlab console and create runner (tags are ec2, docker)  and follow the steps and run gitlab-register command again in the above ec2 and give docker as executer. So 2nd runner is cretaed with the same self hosted ec2.
+
+Then create pipeline as 
+```
+job1:
+  tags:
+    - ec2
+    - shell
+  script:
+    - echo "self managed shell executor"
+job2:
+  tags:
+    - ec2
+    - docker
+  script:
+    - echo "self managed docker executor"
+
+```
+As a prerequisite we have install few things in ec2 , git for job1 and docker for job2.
+
+https://docs.docker.com/engine/install/linux-postinstall/
+```
+sudo yum install git -y
+sudo yum install docker -y
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+sudo systemctl start docker.service
+docker ps
+sudo chmod 777 /var/run/docker.sock
+docker ps
 ```
 
 
