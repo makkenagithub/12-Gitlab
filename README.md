@@ -753,6 +753,161 @@ sudo chmod 777 /var/run/docker.sock
 docker ps
 ```
 
+#### Tools setup:
+Create a group in gitlab, then create a project in that with read me file. 
+
+java code: 
+Clone the repository using git clone https://github.com/DevopsWorking/GitLab-Shell-Java-project-Source-Code.git
+sudo mv GitLab-Shell-Java-project-Source-Code web-app
+
+Download the java code from above github link
+
+Then push the java code from ec2 to gitlab project repos.
+We have java code and Dockerfile in ec2. How do we push to gitlab repos. Goto ec2 and code path
+
+```
+git init
+git remote add origin <gitlab repos url>
+git add .
+git commit -m "add project files"
+git remote add origin <gitlab repos url>
+git branch -M main
+git push -uf origin main
+# here it asks for user name and password of gitlab url
+```
+Now the code is in Gitlab. 
+
+Now set up a runner with shell as executor. Create an ec2 in aws and install basic softwares such as git, docker, and maven.
+
+https://docs.docker.com/engine/install/linux-postinstall/
+```
+sudo yum install git -y
+git -v
+
+sudo yum install docker -y
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+sudo systemctl start docker.service
+docker ps
+sudo chmod 777 /var/run/docker.sock
+docker ps
+
+sudo yum install maven -y
+mvn -v
+```
+
+Then register the runner. Gitlab consol -> Settings -> ci/cd -> runners -> new project runner with tags as tools, ec2.
+
+WE CAN EVEN RUN THE UNTAGGED JOBS ALSO BY SELECTING THE FIELD HERE
+<img width="413" height="210" alt="image" src="https://github.com/user-attachments/assets/38e49a21-1590-4bd4-9231-87b64a95787e" />
+
+Then register the runner in ec2.
+
+MAVEN Commands:
+```
+mvn -v    # to check the maven version
+mvn clean    # is to clear the cache / unnecessary file generated from previous builds
+mvn compile    # compile is build command
+mvn test    # testing/ generating Junit test cases
+mvn package    # generating the jar/war based files.
+```
+We can directly use the below command to clean and generate package
+```
+mvn clean package
+```
+
+##### maven compile
+Now goto the repository where java code is placed and write pipeline .gitlab-ci.yml
+
+```
+stages:
+  - maven-build
+maven-compile:
+  stage: maven-build
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn compile
+```
+<img width="281" height="96" alt="image" src="https://github.com/user-attachments/assets/6e835348-16c7-4fc6-a584-546af500f4d3" />
+
+##### Junit test cases:
+We have code in ec2. Now to understand, we do manually
+
+In the /src/test/java/com/example/ path 2 Junit test cases are there.
+
+To generate the Junit test reports, run below commands
+```
+cd <code-path>
+mvn test
+```
+Now the test reports are generated in the path
+
+/target/surefire-reports/
+
+
+In the src directory we have Junit test cases
+<img width="217" height="213" alt="image" src="https://github.com/user-attachments/assets/f6c8efe7-885a-460f-a2b1-0a4bf268a038" />
+
+After running the mvn test command in ec2, test reports are generated in the path as below
+
+<img width="239" height="311" alt="image" src="https://github.com/user-attachments/assets/51325173-7fc9-479c-bf31-ca7e930be117" />
+
+Here two Junit files are generated
+<img width="426" height="77" alt="image" src="https://github.com/user-attachments/assets/73eadf13-72ac-4222-b06e-af97c4f738fd" />
+
+Add the test stage in pipeline. After test stage junit artifacts are generated. We have to specify the name of junit files which are going to be generated
+
+https://docs.gitlab.com/ci/testing/unit_test_reports/
+
+```
+stages:
+  - maven-build
+  - maven-test
+maven-compile:
+  stage: maven-build
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn compile
+maven-test-job:
+  stage: maven-test
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 30 days
+```
+
+<img width="283" height="173" alt="image" src="https://github.com/user-attachments/assets/554b1e7b-ee69-45f4-91f1-a4bcad336350" />
+
+Git lab is centralised, we can see the tset reports also as below
+
+<img width="431" height="250" alt="image" src="https://github.com/user-attachments/assets/e6d90b20-29d3-4d07-971a-93108b4e16df" />
+
+
+##### gitlab package registry
+We have jfrog, nexus as package registries in the market.
+
+But gitlab provides the package registry also. we can store maven based war/jar files, nuget(for .net) based packages, npm based packages in gitlab package registry.
+
+<img width="494" height="242" alt="image" src="https://github.com/user-attachments/assets/2e43e65a-4005-4290-adce-6fe41af902eb" />
+
+
+
+
+
 
 
 
