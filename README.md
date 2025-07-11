@@ -861,6 +861,8 @@ Add the test stage in pipeline. After test stage junit artifacts are generated. 
 
 https://docs.gitlab.com/ci/testing/unit_test_reports/
 
+https://docs.gitlab.com/ci/testing/unit_test_report_examples/
+
 ```
 stages:
   - maven-build
@@ -903,6 +905,8 @@ We have jfrog, nexus as package registries in the market.
 But gitlab provides the package registry also. we can store maven based war/jar files, nuget(for .net) based packages, npm based packages in gitlab package registry.
 
 <img width="494" height="242" alt="image" src="https://github.com/user-attachments/assets/2e43e65a-4005-4290-adce-6fe41af902eb" />
+
+<img width="493" height="166" alt="image" src="https://github.com/user-attachments/assets/fdde2b57-cc85-4ba9-9371-1b73dcb55708" />
 
 
 
