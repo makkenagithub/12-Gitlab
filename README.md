@@ -1095,6 +1095,8 @@ We can use docker login commands as below
 
 <img width="536" height="266" alt="image" src="https://github.com/user-attachments/assets/4bb30985-5adb-4996-b584-a3c9e7945e0e" />
 
+<img width="301" height="178" alt="image" src="https://github.com/user-attachments/assets/8650787f-16bc-49c6-b39a-c1bfb469042f" />
+
 ```
 stages:
   - maven-build
@@ -1150,7 +1152,101 @@ docker-push-gitlab:
     - tools
     - ec2
   script:
-    - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER_ID --password-stdin
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
     - docker push registry.gitlab.com/<project_name>/<image_name>:$CI_PIPELINE_IID      # dynamic versioning with pipeline ID
 
 ```
+After pushing image to gitlab container registry , it looks as below
+
+<img width="535" height="197" alt="image" src="https://github.com/user-attachments/assets/556a1ea1-a7bc-4f8b-a2b2-3f156f999269" />
+
+#### AWS CLI in pipeline:
+We need to use access and secret keys to use AWS in gitlab. Create region, access and scret keys in AWS console and store them in Gitlab variables
+
+<img width="253" height="123" alt="image" src="https://github.com/user-attachments/assets/9cc7cdb8-0e80-4db8-b1b8-11fbf04f2214" />
+
+The above variable names already exists in gitlab. Just type AWS and gitlab suggests the name and provide the values.
+
+Also aws configure needs to be done in ec2 where gitlab runner is running. We can add a stage in pipeline and do.
+
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+  - docker-container-registry
+  - aws-configure
+aws-job:
+  stage: aws-configure
+  tags:
+    - tools
+    - ec2
+  before_script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_is $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set default_region $AWS_DEFAULT_REGION
+  script:
+    - aws s3 ls    # lists all s3 buckets
+```
+
+##### pusing docker image ro aws ECR:
+Initially cerate a ECR registry in AWS console and get the docker push commands from ecr
+
+<img width="353" height="269" alt="image" src="https://github.com/user-attachments/assets/3c1a296a-ddc6-4aac-a3fe-ea090795672d" />
+
+<img width="348" height="58" alt="image" src="https://github.com/user-attachments/assets/cdd31aa8-7b0c-4bc6-b127-a2f4c96b9d3d" />
+
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+  - docker-container-registry
+  - aws-configure
+  - aws-ecr
+
+package-job:
+  stage: package
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn deploy -s settings.xml
+
+docker-build:
+  stage: docker
+  tags:
+    - tools
+    - ec2
+  script:
+    - docker build -t <get from aws ecr push commands list>:$CI_PIPELINE_IID .    
+  after_script:
+    - docker images
+
+aws-configure-job:
+  stage: aws-configure
+  tags:
+    - tools
+    - ec2
+  before_script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_is $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set default_region $AWS_DEFAULT_REGION
+  script:
+    - aws s3 ls    # lists all s3 buckets
+
+aws-ecr-job:
+  stage: aws-ecr
+  tags:
+    - ec2
+    - tools
+  script:
+    - <login command from ecr>
+    - <push command from ecr>
+```
+<img width="413" height="160" alt="image" src="https://github.com/user-attachments/assets/3dfbe0eb-829f-4f87-be48-c9311ad43c3a" />
+
+
+
