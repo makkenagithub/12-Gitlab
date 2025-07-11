@@ -960,10 +960,134 @@ After successful running of above pipeline package is stored in package registry
 
 This is the alternative of jfrog or nexus package registry
 
+##### building docker image:
 
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+maven-compile:
+  stage: maven-build
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn compile
+maven-test-job:
+  stage: maven-test
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 30 days
 
+package-job:
+  stage: package
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn deploy -s settings.xml
 
+docker-build:
+  stage: docker
+  tags:
+    - tools
+    - ec2
+  script:
+    - docker build -t suresh/gitlabtools:$CI_PIPELINE_IID .    # tags should be same as docker hub repository created,  # dynamic versioning with pipeline ID
+  after_script:
+    - docker images
 
+```
+<img width="276" height="83" alt="image" src="https://github.com/user-attachments/assets/7f90f74e-1578-4a3b-8edb-a6989af3372b" />
 
+##### docker commands
+<img width="200" height="119" alt="image" src="https://github.com/user-attachments/assets/ecbc78c9-08d1-4884-8feb-4d77efa06de1" />
 
+```
+docker login
+docker pull [image]
+docker push [image]
+docker search [term]
+```
+
+##### docker push image to docker hub:
+create user_id and password variables in gitlab with protected option.
+
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+  - docker-hub
+maven-compile:
+  stage: maven-build
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn compile
+maven-test-job:
+  stage: maven-test
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 30 days
+
+package-job:
+  stage: package
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn deploy -s settings.xml
+
+docker-build:
+  stage: docker
+  tags:
+    - tools
+    - ec2
+  script:
+    - docker build -t suresh/gitlabtools:$CI_PIPELINE_IID .    # tags should be same as docker hub repository created,  # dynamic versioning with pipeline ID
+  after_script:
+    - docker images
+
+docker-push:
+  stage: docker-hub
+  tags:
+    - tools
+    - ec2
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER_ID --password-stdin
+    - docker push suresh/gitlabtools:$CI_PIPELINE_IID      # dynamic versioning with pipeline ID
+
+```
+We can use docker login commands as below
+```
+ - docker login -u $DOCKER_USER_ID -p $DOCKER_PASSWORD
+ - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER_ID --password-stdin
+```
 
