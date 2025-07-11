@@ -912,6 +912,54 @@ But gitlab provides the package registry also. we can store maven based war/jar 
 
 https://docs.gitlab.com/user/packages/package_registry/
 
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+maven-compile:
+  stage: maven-build
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn compile
+maven-test-job:
+  stage: maven-test
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 30 days
+
+package-job:
+  stage: package
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn deploy -s settings.xml
+
+```
+In settings.xml and pom.xml we have to provide some info related to gitlab. Its unable to understand completely.
+
+After successful running of above pipeline package is stored in package registry
+
+<img width="559" height="187" alt="image" src="https://github.com/user-attachments/assets/d38c2693-a84a-4e9e-ad88-33ce45ef6a94" />
+
+<img width="552" height="284" alt="image" src="https://github.com/user-attachments/assets/8f4f2e76-9d71-4991-bed1-b3802d43c422" />
+
+This is the alternative of jfrog or nexus package registry
+
 
 
 
