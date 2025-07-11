@@ -908,7 +908,9 @@ But gitlab provides the package registry also. we can store maven based war/jar 
 
 <img width="493" height="166" alt="image" src="https://github.com/user-attachments/assets/fdde2b57-cc85-4ba9-9371-1b73dcb55708" />
 
+<img width="203" height="236" alt="image" src="https://github.com/user-attachments/assets/82776b4e-0716-4f01-90a7-50bfa0418dff" />
 
+https://docs.gitlab.com/user/packages/package_registry/
 
 
 
