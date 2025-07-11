@@ -1091,3 +1091,66 @@ We can use docker login commands as below
  - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER_ID --password-stdin
 ```
 
+##### gitlab container registry:
+
+<img width="536" height="266" alt="image" src="https://github.com/user-attachments/assets/4bb30985-5adb-4996-b584-a3c9e7945e0e" />
+
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+  - docker-container-registry
+maven-compile:
+  stage: maven-build
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn compile
+maven-test-job:
+  stage: maven-test
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 30 days
+
+package-job:
+  stage: package
+  tags:
+    - tools
+    - ec2
+  script:
+    - mvn deploy -s settings.xml
+
+docker-build:
+  stage: docker
+  tags:
+    - tools
+    - ec2
+  script:
+    - docker build -t registry.gitlab.com/<project_name>/<image_name>:$CI_PIPELINE_IID .    # tags should be same as docker hub repository created,  # dynamic versioning with pipeline ID
+  after_script:
+    - docker images
+
+docker-push-gitlab:
+  stage: docker-container-registry
+  tags:
+    - tools
+    - ec2
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USER_ID --password-stdin
+    - docker push registry.gitlab.com/<project_name>/<image_name>:$CI_PIPELINE_IID      # dynamic versioning with pipeline ID
+
+```
