@@ -1459,4 +1459,30 @@ Here gitlab gives terraform init command
 
 <img width="354" height="215" alt="image" src="https://github.com/user-attachments/assets/b4920915-353f-42e6-a309-8fbd5b22bb6b" />
 
+Add the below block in provider.tf file
+
+terraform {
+  backend "http" {
+  }
+}
+
+Then, place the above terraform init command in the pipeline.
+
+```
+stages:
+  - terraform
+job1:
+  stage: terraform
+  tags:
+    - ec2
+    - tools
+  script:
+    - terraform init
+    - terrafom plan
+    - terrafomr apply -auto-approve
+```
+
+
+
+
 
