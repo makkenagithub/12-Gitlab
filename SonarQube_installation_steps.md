@@ -37,8 +37,11 @@ su sonarqube
 
 ## 7.. start the server 
 cd sonarqube-10.1.0.73491/
+
 cd bin
+
 cd linux-x86-64/
+
 ./sonar.sh start
 
 ## 8.. check the status using 
