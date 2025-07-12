@@ -1232,7 +1232,7 @@ aws-configure-job:
     - ec2
   before_script:
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key_is $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_id $AWS_SECRET_ACCESS_KEY_ID
     - aws configure set default_region $AWS_DEFAULT_REGION
   script:
     - aws s3 ls    # lists all s3 buckets
@@ -1481,6 +1481,99 @@ job1:
     - terrafom plan
     - terrafomr apply -auto-approve
 ```
+
+#### Gitlab Kubernetes Agent
+
+<img width="497" height="215" alt="image" src="https://github.com/user-attachments/assets/35d053a1-ff58-49d7-b7b1-63316a3d611c" />
+
+<img width="505" height="229" alt="image" src="https://github.com/user-attachments/assets/2b35b117-29e7-4d3e-afb0-dc67ffb9eb15" />
+
+<img width="512" height="134" alt="image" src="https://github.com/user-attachments/assets/92cef65c-7222-485d-a783-44a7ccca99c7" />
+
+Here we created an EKS cluster having nodes. Then we created an EC2 server i.e. workstation server which contains kubectl, which is to communicate with eks cluster. And also run "aws update kube-config" command so that the server communicates with the EKS cluster
+
+Now were are in workstation server.
+ 
+In gitlab, we have java source code, k8s manifest file. Then goto gitlab console -> operate -> kubernetes clusters
+
+<img width="565" height="284" alt="image" src="https://github.com/user-attachments/assets/240f7cd1-feb8-4976-84e4-1c8647a48cbd" />
+
+<img width="554" height="272" alt="image" src="https://github.com/user-attachments/assets/f0ce7700-08c3-40bf-ad39-8a12b468e4ca" />
+
+Now its provides set of helm commands with security token. Run all these commands in work station server, ensure helm is already exists in workstation server.
+
+<img width="386" height="260" alt="image" src="https://github.com/user-attachments/assets/23d06089-f184-4efe-a5dd-60efdb228e0b" />
+
+<img width="422" height="197" alt="image" src="https://github.com/user-attachments/assets/158401ff-1a21-4e3d-a08d-9e47ef86fbbc" />
+
+Observe a new namspace is created for gitlab agent and ensure its pods are running as below
+
+<img width="436" height="89" alt="image" src="https://github.com/user-attachments/assets/88e3b1c8-f36b-49f5-9f4e-d47a91b33376" />
+
+We need to create an agent config file 
+
+https://docs.gitlab.com/user/clusters/agent/install/#create-an-agent-configuration-file
+
+In the repository, in the default branch, create an agent configuration file with the name below 
+```
+.gitlab/agents/<agent-name>/config.yaml
+```
+
+Add the folloing content to the file to authorise the projects to access the agent.
+
+https://docs.gitlab.com/user/clusters/agent/ci_cd_workflow/#authorize-agent-access
+
+```
+ci_access:
+  projects:
+    - id: path/to/project
+```
+
+<img width="373" height="199" alt="image" src="https://github.com/user-attachments/assets/0a05f78e-5db1-4f91-a62e-07ca0dea6024" />
+
+After this only agent shows as connected
+
+<img width="557" height="281" alt="image" src="https://github.com/user-attachments/assets/9636288b-956e-498a-8627-40abcb84a34b" />
+
+
+#### k8s deployment using gitlab agent:
+
+Create an ec2 for using it as runner and intsall git, kubectl in the runner server. Use shell executor in the runner.
+
+Then goto repository and create pipeline
+
+```
+stages:
+  - aws-configure
+  - deploy
+variables:
+  KUBE_CONTEXT: <project-path-in-gitlab>:<agent-name>
+
+aws-configure-job:
+  stage: aws-configure
+  tags:
+    - tools
+    - ec2
+  script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_id $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set default_region $AWS_DEFAULT_REGION
+
+deploy_job:
+  stage: deploy
+  tags:
+    - tools
+    - ec2
+  script:
+    - kubectl config use-context "$KUBE_CONTEXT"
+    - kubectl apply -f application.yaml
+  
+```
+The above pipeline will run in the runner and deploys to eks cluster.
+
+Now goto workstation server and see the pods
+
+<img width="314" height="80" alt="image" src="https://github.com/user-attachments/assets/a0e93040-8d32-494e-a79b-14bd9a654d49" />
 
 
 
