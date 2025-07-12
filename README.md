@@ -1577,5 +1577,14 @@ Now goto workstation server and see the pods
 
 
 
+#### Capstone project - shell executor:
+
+source code  -  https://github.com/DevopsWorking/GitLab-Shell-Java-project-Source-Code
+
+infra setup -  https://github.com/DevopsWorking/Infra-SetUp-Files-gitlab-project
+
+<img width="368" height="243" alt="image" src="https://github.com/user-attachments/assets/c5e17869-cbd2-44d3-b75d-f9102e845037" />
+
+
 
 
