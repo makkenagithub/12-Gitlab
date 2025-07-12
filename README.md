@@ -1387,7 +1387,7 @@ https://eksctl.io/installation/
 
 Then create eks cluster in aws.
 
-Once we install kubectl, ekactl in a server, it does not know to which eks cluster it needs to communicate. For that we use below command
+Once we install kubectl, eksctl in a server, it does not know to which eks cluster it needs to communicate. For that we use below command
 
 ```
 aws eks update-kubeconfig --region region-code --name my-cluster
@@ -1418,3 +1418,45 @@ k8s-job:
   script:
     - kubectl version
 ```
+
+##### terraform
+install terraform in the runner ec2 server. Then come to gitlab and write pipeline
+
+```
+stages:
+  - terraform
+job1:
+  stage: terraform
+  tags:
+    - ec2
+    - tools
+  script:
+    - terrafomr -v
+```
+
+To create infra using terraform from gitlab pipeline, then, create teffatorm files (main.tf, variables.tf, provider.tf etc) in the gitlab repos and
+write pipeline as below
+```
+stages:
+  - terraform
+job1:
+  stage: terraform
+  tags:
+    - ec2
+    - tools
+  script:
+    - terraform init
+    - terrafom plan
+    - terrafomr apply -auto-approve
+```
+##### terraform state file storage in Gitlab:
+
+<img width="540" height="302" alt="image" src="https://github.com/user-attachments/assets/bdcb5a11-ceef-4cfe-9bb3-30177eb18521" />
+
+Here gitlab gives terraform init command
+
+<img width="551" height="276" alt="image" src="https://github.com/user-attachments/assets/ec3e499f-27b5-4aa3-8475-5bd7deb1a2a6" />
+
+<img width="354" height="215" alt="image" src="https://github.com/user-attachments/assets/b4920915-353f-42e6-a309-8fbd5b22bb6b" />
+
+
