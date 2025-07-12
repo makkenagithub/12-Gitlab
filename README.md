@@ -1374,4 +1374,47 @@ include:
   - template: Jobs/SAST.gitlab-ci.yml
 ```
 
+##### EKS Setup in runner server:
+Goto runner server and install eksctl and kubectl
 
+kubectl
+
+https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+
+eksctl
+
+https://eksctl.io/installation/
+
+Then create eks cluster in aws.
+
+Once we install kubectl, ekactl in a server, it does not know to which eks cluster it needs to communicate. For that we use below command
+
+```
+aws eks update-kubeconfig --region region-code --name my-cluster
+```
+We use the above command in next pipeline
+
+##### pipeline using k8s:
+
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+  - docker-container-registry
+  - aws-configure
+  - aws-ecr
+  - sonar
+  - kubernetes
+
+k8s-job:
+  stage: kubernetes
+  tags:
+    - ec2
+    - tools
+  before_script:
+    - aws eks update-kubeconfig --region region-code --name my-cluster
+  script:
+    - kubectl version
+```
