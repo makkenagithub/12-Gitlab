@@ -13,6 +13,8 @@ sudo yum install java-17-amazon-corretto-devel
 ##  2.. Add sonarqube as user as for sonarqube specific user is required (make sure u set password using sudo passwd)
 sudo useradd sonarqube
 
+sudo passwd sonarqube
+
 ##  3.. add sonarqube user in the sudoers list or visudo in the wheel group in order to user sudo, command is
 $ sudo visudo
 Scroll down and add user name sonarqube as below
