@@ -1248,5 +1248,130 @@ aws-ecr-job:
 ```
 <img width="413" height="160" alt="image" src="https://github.com/user-attachments/assets/3dfbe0eb-829f-4f87-be48-c9311ad43c3a" />
 
+##### sonarqube setup:
+Take an ec2 and install sonarqube and stat the sonarqube and open the url with port 9000, ans user and password are admin, admin
+
+its looks as below
+
+<img width="539" height="282" alt="image" src="https://github.com/user-attachments/assets/592b0b93-596e-4f74-bf8c-97816ce9adaa" />
+
+##### gitlab - sonar qube integration:
+
+click on gitlab
+<img width="539" height="282" alt="image" src="https://github.com/user-attachments/assets/444668e1-a492-4b1e-ab6f-d8298202212d" />
+
+Goto gitlab and get access token. Gitlab -> settings -> edit profile -> Access tokens -> add new token and choose all accesses 
+
+And fill the sonarqube configuration with token
+
+<img width="361" height="218" alt="image" src="https://github.com/user-attachments/assets/04134f54-a71f-430d-89aa-8ae6f27ccaa7" />
+
+All the projecs are displayed as below and click on setup of the required project
+
+<img width="539" height="264" alt="image" src="https://github.com/user-attachments/assets/ac0b1b58-9082-4c30-87b6-89fcde168cd6" />
+
+Click on global setting and create project
+
+<img width="513" height="221" alt="image" src="https://github.com/user-attachments/assets/964e604f-a8fe-43c6-8725-354afd082bb6" />
+
+<img width="538" height="271" alt="image" src="https://github.com/user-attachments/assets/195193c5-a8f0-4fac-9f3b-8a1e8515aa70" />
+
+Then it shows the what all env variables to be added in gitlab, follow that
+
+<img width="629" height="323" alt="image" src="https://github.com/user-attachments/assets/4e64063c-2d8b-4bd6-9183-d4abe1f79599" />
+
+Next choose the project maven/.net /other JS options and follw th steps given
+
+<img width="532" height="273" alt="image" src="https://github.com/user-attachments/assets/f16758d8-f5c1-47fe-8c30-04b662fd0bec" />
+
+```
+stages:
+  - maven-build
+  - maven-test
+  - package
+  - docker
+  - docker-container-registry
+  - aws-configure
+  - aws-ecr
+  - sonar
+
+sonarqube-check:
+  stage: sonar
+  image: maven:3.9.3-eclipse-temurin-17
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - mvn verify sonar:sonar -Dsonar.qualitygate.wait=true
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main' || $CI_PIPELINE_SOURCE == 'merge_request_event'
+```
+The aboe pipeline will run on shared runner with the image mentioned above, as we did not specify the tags of ec2 runner
+
+<img width="304" height="239" alt="image" src="https://github.com/user-attachments/assets/feb2ed9e-a51c-45d3-a049-e13242d16e88" />
+
+<img width="539" height="281" alt="image" src="https://github.com/user-attachments/assets/23f24f3c-c5b0-4018-b1b1-21301396b010" />
+
+#### SAST - static application security testing:
+
+SAST is inbuilt feature available in gitlab.
+
+<img width="473" height="227" alt="image" src="https://github.com/user-attachments/assets/8c3fd4f3-11b1-4413-870d-9f417cb115f7" />
+
+We need include below template in gitlab pipeline
+
+<img width="480" height="163" alt="image" src="https://github.com/user-attachments/assets/dc3a9af3-119c-43cd-93c4-ae8d43b2b1e2" />
+
+##### SAST on new gitlab project:
+While creating the project in gitlab, we have an option to tick mark the SAST option, as below
+
+<img width="548" height="247" alt="image" src="https://github.com/user-attachments/assets/55322a0f-8e87-42b2-bc05-bd112e9317c7" />
+
+<img width="425" height="268" alt="image" src="https://github.com/user-attachments/assets/9f04b44a-246d-4630-bb46-b9cee4e7df88" />
+
+When we click on SAST enable option, it provides the pipeline file 
+
+<img width="383" height="263" alt="image" src="https://github.com/user-attachments/assets/2fa7b6d0-40d6-4d93-a873-57dfdc0f4484" />
+
+<img width="417" height="131" alt="image" src="https://github.com/user-attachments/assets/9c97b157-cc73-426b-99de-668b1263a357" />
+
+IF we have our code in liunux machine, then push the code to gitlab new project repos as below
+
+<img width="371" height="208" alt="image" src="https://github.com/user-attachments/assets/9c24cc50-6ee3-4477-860e-55276b2577ae" />
+
+then use 
+
+git add . ; git commit -m "message"; git push -uf origin 
+
+Now the code came to gitlab
+
+<img width="441" height="223" alt="image" src="https://github.com/user-attachments/assets/b7b89fd8-f367-493b-9a06-da4c307adc1c" />
+
+Then pipeline runs and SAST is performed on the code, and artifacts are uploaded
+
+<img width="283" height="95" alt="image" src="https://github.com/user-attachments/assets/b74e576d-c21a-4db5-bb93-a0514357e2f3" />
+
+<img width="554" height="217" alt="image" src="https://github.com/user-attachments/assets/b66f659c-b016-46b1-9b64-7ece6b79947e" />
+
+##### SAST on existing project:
+
+create a project without enabling SAST option in gitlab, then push the code to this repository and create a pipeline file as below
+
+https://docs.gitlab.com/user/application_security/sast/
+
+```
+stages:
+  - sast-test
+job1:
+  stage: sast-test
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+```
 
 
