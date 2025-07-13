@@ -1687,3 +1687,54 @@ job-k8s:
 
 ```
 
+#### Capstone project - using gitlab-tools:
+
+1. Create a project in gitlab and push the source code from local aws ec2 server to gitlab repos.
+2. Use local server for kubectl
+3. install git, kubectl, eksctl, helm in local server.
+
+We are using all the gitlab inbuilt tools/features in this project. I.e. shared runner, artifacts storage, SAST, package registry (add settings.xml, modify pom.xml as required for gitlab documentation), container registry, gitlab kubernetes agent
+
+All the jobs run on shared runner
+```
+stages:
+  - build
+  - test
+  - sast
+  - package
+
+job-build:
+  stage: build
+  image: maven:latest
+  script:
+    - mvn clean package
+  artifacts:
+    name: war-file
+    paths:
+      - target/my-webapp.war
+
+job-test:
+  stage: test
+  image: maven:latest
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+
+job-sast:
+  stage: sast
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+
+job-package:
+  stage: package
+  image: maven:latest
+  script:
+    - mvn deploy -s settings.xml
+
+
+
+```
