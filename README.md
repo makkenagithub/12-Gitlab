@@ -1691,17 +1691,31 @@ job-k8s:
 
 1. Create a project in gitlab and push the source code from local aws ec2 server to gitlab repos.
 2. Use local server for kubectl
-3. install git, kubectl, eksctl, helm in local server.
+3. install git, kubectl, eksctl, helm in local server. And perform aws configure, aws eks update-kubeconfig  also.
+
+Agebt setup
+4. while performing gitlab agent setup for k8s, we need to run the set of helm commands provided by gitlab
+5. create a file in gitlab repos .gitlab/agents/<agent-name>/config.yaml and add following content to it
+```
+ci_access:
+  projects:
+    - id: path/to/project
+```
+6. create a variable in gitlab with name and value as KUBE_CONTEXT: <project-path-in-gitlab>:<agent-name>
 
 We are using all the gitlab inbuilt tools/features in this project. I.e. shared runner, artifacts storage, SAST, package registry (add settings.xml, modify pom.xml as required for gitlab documentation), container registry, gitlab kubernetes agent
 
 All the jobs run on shared runner
+
+dind is docker inside docker
 ```
 stages:
   - build
   - test
   - sast
   - package
+  - docker
+  - k8s
 
 job-build:
   stage: build
@@ -1735,6 +1749,29 @@ job-package:
   script:
     - mvn deploy -s settings.xml
 
+job-docker:
+  stage: docker
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind    # dind is docker inside docker
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
+  script:
+    - docker build -t registry.gitlab.com/<project_name>/<image_name>:latest .
+    - docker push registry.gitlab.com/<project_name>/<image_name>:latest   
 
+job-k8s:
+  stage: k8s
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  before_script:
+    - KUBECTL intsallation commands from aws official documentation
+  script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_is $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set default_region $AWS_DEFAULT_REGION
+    - kubectl config use-context "$KUBE_CONTEXT"
+    - kubectl apply -f Application.yaml
 
 ```
