@@ -947,7 +947,7 @@ package-job:
     - tools
     - ec2
   script:
-    - mvn deploy -s settings.xml
+    - mvn deploy -s settings.xml     # deploy command: copies the final package to the remote repository for sharing with other developers and projects.
 
 ```
 In settings.xml and pom.xml we have to provide some info related to gitlab. Its unable to understand completely.
@@ -998,7 +998,7 @@ package-job:
     - tools
     - ec2
   script:
-    - mvn deploy -s settings.xml
+    - mvn deploy -s settings.xml     # deploy command: copies the final package to the remote repository for sharing with other developers and projects.
 
 docker-build:
   stage: docker
@@ -1063,7 +1063,7 @@ package-job:
     - tools
     - ec2
   script:
-    - mvn deploy -s settings.xml
+    - mvn deploy -s settings.xml     # deploy command: copies the final package to the remote repository for sharing with other developers and projects.
 
 docker-build:
   stage: docker
@@ -1134,7 +1134,7 @@ package-job:
     - tools
     - ec2
   script:
-    - mvn deploy -s settings.xml
+    - mvn deploy -s settings.xml    #  deploy command: copies the final package to the remote repository for sharing with other developers and projects.
 
 docker-build:
   stage: docker
@@ -1213,7 +1213,7 @@ package-job:
     - tools
     - ec2
   script:
-    - mvn deploy -s settings.xml
+    - mvn deploy -s settings.xml    # deploy command: copies the final package to the remote repository for sharing with other developers and projects.
 
 docker-build:
   stage: docker
@@ -1602,5 +1602,88 @@ Pipeline setup:
 6. k8s deployment
 
 
+```
+stages:
+  - maven
+  - deploy-to-package-repos
+  - sonar
+  - docker
+  - aws
+  - k8s
 
+job-maven:
+  stage: maven
+  tags:
+    - ec2
+    - java
+  script:
+    - mvn clean package
+    - mvn test
+  artifacts:
+    name: war-file
+    paths:
+      - target/my-webapp.war
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 30 days
+
+job-deploy:
+  stage: deploy-to-package-repos
+  tags:
+    - ec2
+    - java
+  script:
+    - mvn deploy -s settings.xml
+
+job-sonarqube:    # this job runs on shared runner
+  stage: sonar
+  image: maven:3.9.3-eclipse-temurin-17
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - mvn verify sonar:sonar -Dsonar.qualitygate.wait=true
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main' || $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+job-docker:
+  stage: docker
+  tags:
+    - ec2
+    - java
+  script:
+    - docker build -t registry.gitlab.com/<project_name>/<image_name>:latest .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
+    - docker push registry.gitlab.com/<project_name>/<image_name>:latest     
+
+job-aws-configure:
+  satge: aws
+  tags:
+    - ec2
+    - java
+  script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_is $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set default_region $AWS_DEFAULT_REGION
+
+job-k8s:
+  stage: k8s
+  tags:
+    - ec2
+    - java
+  script:
+    - aws eks update-kubeconfig --region us-east-1 --name <cluster-name>
+    - kubectl apply -f Application.yaml
+
+```
 
