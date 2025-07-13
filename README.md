@@ -1585,12 +1585,21 @@ infra setup -  https://github.com/DevopsWorking/Infra-SetUp-Files-gitlab-project
 
 <img width="368" height="243" alt="image" src="https://github.com/user-attachments/assets/c5e17869-cbd2-44d3-b75d-f9102e845037" />
 
+Infra setup:
 
 1. code is in local server
 2. Need to create a gitlab project and bring the code to gitlab
 3. Need a main runner server - We need to install GIT, MAVEN, DOCKER, KUBECTL in the runner (we can use single command as $ sudo yum install git maven docker -y). Dont forget docker post installation steps. 
 4. Need a sonarqube server for code quality SAST
 5. EKS cluster
+
+Pipeline setup:
+1. Maven stage - package and test the code
+2. Deploy stage - to deploy to package repos
+3. sonarqube stage - SAST. These 3 stages are related to code
+4. docker build and push stage
+5. aws configure stage
+6. k8s deployment
 
 
 
