@@ -1,0 +1,5 @@
+```
+ci_access:
+  projects:
+    - id: username/java-project          # path/to/project in gitlab
+```
