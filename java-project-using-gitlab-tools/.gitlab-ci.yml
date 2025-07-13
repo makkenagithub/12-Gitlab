@@ -1,2 +1,66 @@
+stages:
+  - build
+  - test
+  - sast
+  - package
+  - docker
+  - k8s
+
+job-build:
+  stage: build
+  image: maven:latest
+  script:
+    - mvn clean package
+  artifacts:
+    name: war-file
+    paths:
+      - target/my-webapp.war
+
+job-test:
+  stage: test
+  image: maven:latest
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-com.example.AppTest-junit.xml
+        - target/surefire-reports/TEST-com.example.MyServletTest-junit.xml
+
+job-sast:
+  stage: sast
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+
+job-package:
+  stage: package
+  image: maven:latest
+  script:
+    - mvn deploy -s settings.xml
+
+job-docker:
+  stage: docker
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind    # dind is docker inside docker
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
+  script:
+    - docker build -t registry.gitlab.com/<project_name>/<image_name>:latest .
+    - docker push registry.gitlab.com/<project_name>/<image_name>:latest   
+
+job-k8s:
+  stage: k8s
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  before_script:
+    - KUBECTL intsallation commands from aws official documentation
+  script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key_is $AWS_SECRET_ACCESS_KEY_ID
+    - aws configure set default_region $AWS_DEFAULT_REGION
+    - kubectl config use-context "$KUBE_CONTEXT"
+    - kubectl apply -f Application.yaml
 
 
