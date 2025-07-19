@@ -1,0 +1,39 @@
+run_unit_tests:  
+  image: node:17-alpine3.14
+  stage: test
+  tags:
+    - ec2
+    - docker
+    - remote
+  before_script:
+    - cd app
+    - npm install
+  script:
+    - npm test
+  artifacts:
+    reports:
+      junit: app/junit.xml
+
+build_image:
+  stage: build
+  tags:
+    - ec2
+    - shell
+    - remote
+  before_script:
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+push_image:
+  stage: build
+  needs:
+    - build_image
+  tags:
+    - ec2
+    - shell
+    - remote
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+
